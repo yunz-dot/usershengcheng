@@ -1,0 +1,547 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no">
+<title>User 人设生成器 V1.0</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg-gradient:linear-gradient(135deg,#ffd6e7 0%,#d7ecff 55%,#f8fbff 100%);
+  --card-bg:rgba(255,255,255,.94);
+  --line-pink:#ffb7d2;
+  --line-blue:#a7d4ff;
+  --text-main:#5c4b51;
+  --text-sub:#897985;
+  --pink:#ff9fbd;
+  --hot-pink:#ff7fa8;
+  --blue:#79c7ff;
+  --deep-blue:#4aaee8;
+  --purple:#bfa7ff;
+  --green:#79d8aa;
+  --gold:#ffd36a;
+  --tag-bg:#f7fbff;
+  --tag-border:#cfe8ff;
+}
+body{
+  font-family:'Nunito','PingFang SC','Microsoft YaHei',sans-serif;
+  background:var(--bg-gradient);
+  background-attachment:fixed;
+  color:var(--text-main);
+  min-height:100vh;
+  padding-bottom:118px;
+}
+.header{
+  background:rgba(255,255,255,.86);
+  padding:16px;
+  border-bottom:3px dashed var(--line-pink);
+  position:sticky;top:0;z-index:100;
+  text-align:center;
+  backdrop-filter:blur(10px);
+  box-shadow:0 4px 14px rgba(121,199,255,.18);
+}
+h1{font-size:24px;color:var(--hot-pink);margin-bottom:6px;text-shadow:1px 1px 0 #fff,2px 2px 0 rgba(255,183,210,.45)}
+.sub{font-size:12px;color:var(--text-sub);line-height:1.55;font-weight:800}
+.wrap{padding:16px;max-width:1120px;margin:0 auto}
+.card{
+  background:var(--card-bg);
+  border:2px dashed var(--line-blue);
+  border-radius:24px;
+  padding:24px 20px 20px;
+  margin-bottom:24px;
+  position:relative;
+  box-shadow:0 8px 22px rgba(121,199,255,.14);
+}
+.tape{position:absolute;top:-12px;left:50%;transform:translateX(-50%) rotate(-3deg);width:108px;height:26px;background:rgba(255,183,210,.72);border-left:2px dotted #fff;border-right:2px dotted #fff;box-shadow:1px 2px 5px rgba(0,0,0,.05)}
+.tape.blue{background:rgba(121,199,255,.72);transform:translateX(-50%) rotate(2deg)}
+.title{font-size:18px;font-weight:900;color:var(--hot-pink);margin-bottom:12px;display:inline-block;border-bottom:4px solid var(--blue);padding-bottom:2px;border-radius:2px}
+.title:before{content:'🐾 '}
+.desc{font-size:12px;color:var(--text-sub);line-height:1.65;background:#fff6fa;padding:9px 11px;border-left:4px solid var(--pink);border-radius:10px;margin-bottom:12px}
+label{display:block;font-size:13px;color:var(--text-main);font-weight:900;margin:14px 0 6px}
+.label-note{font-size:11px;color:var(--text-sub);font-weight:400;margin-left:4px}
+input,select,textarea{width:100%;padding:12px 14px;border-radius:14px;border:2px solid var(--tag-border);background:#fff;color:var(--text-main);font-size:14px;outline:none;transition:.2s;box-shadow:inset 0 2px 4px rgba(0,0,0,.02)}
+input:focus,select:focus,textarea:focus{border-color:var(--hot-pink);box-shadow:0 0 0 3px rgba(255,159,189,.24)}
+textarea{min-height:86px;resize:vertical;line-height:1.65}.bigtextarea{min-height:150px}.midtextarea{min-height:118px}
+.row{display:grid;grid-template-columns:1fr 1fr;gap:12px}.row3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px}.row4{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
+.tags{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:6px}.tag{font-size:12px;padding:8px 13px;border-radius:999px;background:var(--tag-bg);border:1px solid var(--tag-border);color:#557;user-select:none;cursor:pointer;transition:.15s}
+.tag:hover{transform:translateY(-1px);border-color:var(--blue);box-shadow:0 4px 8px rgba(121,199,255,.22)}
+.tag.on{background:linear-gradient(135deg,var(--hot-pink),var(--pink));color:#fff;border-color:var(--hot-pink);font-weight:900;box-shadow:0 4px 10px rgba(255,127,168,.34)}
+.section-box{background:#f8fcff;border:1px dashed var(--line-blue);border-radius:16px;padding:14px;margin-top:12px}
+.section-box.pink{background:#fff8fb;border-color:var(--line-pink)}
+.output{white-space:pre-wrap;line-height:1.82;font-size:14px;color:var(--text-main);background:#fff;padding:20px;border-radius:16px;border:2px solid var(--line-pink);box-shadow:inset 0 0 10px rgba(255,183,210,.1)}
+.placeholder{color:var(--text-sub);text-align:center;padding:40px 10px;background:transparent;border:2px dashed var(--line-pink)}
+.hl{display:block;margin:20px 0 10px;padding-left:12px;border-left:6px solid var(--hot-pink);font-weight:900;color:var(--hot-pink);font-size:16px;background:linear-gradient(90deg,rgba(255,183,210,.2),transparent);border-radius:0 8px 8px 0}
+.bar{position:fixed;bottom:0;left:0;right:0;background:rgba(255,255,255,.96);border-top:3px dashed var(--line-blue);padding:12px 16px;display:grid;grid-template-columns:1fr 1fr 1fr 1fr 1.4fr;gap:10px;z-index:150;backdrop-filter:blur(8px);box-shadow:0 -4px 15px rgba(121,199,255,.16)}
+button{border:none;border-radius:16px;padding:12px;color:#fff;font-weight:900;font-size:14px;cursor:pointer;transition:.15s;display:flex;align-items:center;justify-content:center;gap:4px}
+button:hover{transform:translateY(-2px);filter:brightness(1.05);box-shadow:0 4px 12px rgba(0,0,0,.1)}button:disabled{opacity:.55;cursor:not-allowed;transform:none}
+.btn-primary{background:linear-gradient(135deg,var(--hot-pink),var(--pink));box-shadow:0 4px 12px rgba(255,127,168,.35)}.btn-blue{background:linear-gradient(135deg,var(--deep-blue),var(--blue));box-shadow:0 4px 12px rgba(121,199,255,.35)}.btn-green{background:linear-gradient(135deg,#3cb371,var(--green));box-shadow:0 4px 12px rgba(60,179,113,.28)}.btn-gold{background:linear-gradient(135deg,#ffb90f,var(--gold));color:#fff;box-shadow:0 4px 12px rgba(255,211,106,.38)}.btn-white{background:#fff;border:2px solid var(--line-pink);color:var(--hot-pink)}
+.small{font-size:12px;color:var(--text-sub);line-height:1.55}.save{background:#fff;border:2px dashed var(--line-blue);border-radius:16px;padding:14px;margin-top:12px}.actions{display:flex;gap:8px;margin-top:10px;flex-wrap:wrap}.actions button{font-size:12px;padding:7px 12px;border-radius:10px}
+.toast{position:fixed;bottom:104px;left:50%;transform:translateX(-50%);background:rgba(255,127,168,.96);color:#fff;border:2px solid #fff;padding:12px 24px;border-radius:999px;font-size:14px;font-weight:900;box-shadow:0 6px 16px rgba(255,127,168,.45);display:none;z-index:200}.warn{background:#fff0f6;border:1px solid var(--line-pink);color:#d1477a;padding:12px;border-radius:14px;font-size:12px;line-height:1.6;margin-top:12px}.file-input{display:none}.pillnote{display:inline-block;font-size:11px;color:#fff;background:var(--hot-pink);border-radius:999px;padding:3px 8px;margin-left:6px;font-weight:900;vertical-align:middle}.pillnote.blue{background:var(--deep-blue)}
+@media(max-width:760px){.row,.row3,.row4{grid-template-columns:1fr}.bar{grid-template-columns:1fr 1fr}.bar button{font-size:13px;padding:10px}.card{padding:20px 14px 14px;border-radius:20px}}
+</style>
+</head>
+<body>
+<div class="header">
+  <h1>🐾 User 人设生成器 V1.0 🐾</h1>
+  <div class="sub">By 清皊</div>
+</div>
+<div class="wrap">
+  <div class="card">
+    <div class="tape"></div>
+    <div class="title">✨ API 魔法设置</div>
+    <div class="desc">接口兼容 /v1/chat/completions。Key 仅保存在本地浏览器；公开部署请使用后端代理。</div>
+    <div class="row">
+      <div><label>API Base URL</label><input id="apiBase" placeholder="https://api.openai.com/v1"></div>
+      <div><label>Model</label><select id="modelSelect" onchange="selectModel()"><option value="">请选择模型</option></select><input id="model" placeholder="也可手动输入模型名" style="margin-top:8px"></div>
+    </div>
+    <label>API Key</label><input id="apiKey" type="password" placeholder="sk-...">
+    <div class="row3" style="margin-top:14px">
+      <button class="btn-blue" onclick="saveApi()">💾 保存设置</button>
+      <button class="btn-white" onclick="fetchModels()">🔄 拉取模型</button>
+      <button class="btn-green" onclick="testApi()">⚡ 测试连接</button>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="tape blue"></div>
+    <div class="title">① User 基础设定 <span class="pillnote">AI匹配依据</span></div>
+    <div class="desc">这里写得越具体，AI 智能匹配标签越准。适合生成女主、群聊中心位、世界观代入角色、AI小手机长期陪伴中的 user 面具。</div>
+    <div class="row4">
+      <div><label>User 名字 / 昵称</label><input id="userName" placeholder="例：苏 / 小鱼 / Laurel / 自定义"></div>
+      <div><label>性别 / 性向</label><select id="userGender"><option selected>女性/BG向</option><option>女性/GL向</option><option>不限/由设定决定</option><option>男性/BG向</option><option>男性/BL向</option><option>中性/无性别</option><option>只对特定关系特殊</option></select></div>
+      <div><label>年龄段</label><select id="userAge"><option>未指定</option><option>高中生</option><option>大学生</option><option>初入职场</option><option>成熟职场人</option><option>自由职业/创作者</option><option>古风少女/小姐</option><option>异世界身份</option></select></div>
+      <div><label>生成方向</label><select id="personaType"><option>女性向小说女主</option><option>群聊中心位User</option><option>AI陪伴用User面具</option><option>校园文User</option><option>娱乐圈User</option><option>豪门/家族User</option><option>普通生活感User</option><option>强世界观主角User</option><option>成长型User</option><option>自定义User</option></select></div>
+    </div>
+    <label>User 人设 / 想要的感觉</label>
+    <textarea id="goal" class="bigtextarea" placeholder="例：想生成一个看似温柔懂事、其实边界很硬的女性向女主。她在群聊/故事里是被偏爱的中心位，但不是空心万人迷，要有自己的生活、缺点、成长线和世界观位置。"></textarea>
+    <label>补充要求 / 避雷</label>
+    <textarea id="extra" placeholder="例：不要写成完美女主；要有普通生活感、软肋和不完美；世界观要完整；要能解释为什么角色会被她吸引。"></textarea>
+    <div class="row" style="margin-top:14px">
+      <button class="btn-primary" id="autoTagBtn" onclick="autoPickTags()">🤖 AI 根据①智能匹配标签</button>
+      <button class="btn-white" onclick="randomPickAllTags(true)">🎲 随机换一组标签</button>
+    </div>
+    <div class="warn">AI 智能匹配会同时选择世界观、User身份、多层人格、外貌、爱好、关系吸引力等标签。未配置 API 时，会用本地关键词逻辑兜底。</div>
+  </div>
+
+  <div class="card">
+    <div class="tape"></div>
+    <div class="title">② 世界观 / User 世界位置</div>
+    <label>世界大类</label><div class="tags" id="worldType"></div>
+    <label>世界规则 / 流派细分</label><div class="tags" id="worldSubType"></div>
+    <label>世界关键词 / 压力来源</label><div class="tags" id="worldKeywords"></div>
+    <label>世界观作用</label><div class="tags" id="worldFunction"></div>
+    <label>世界日常质感</label><div class="tags" id="worldDailyTexture"></div>
+    <label>User 的社会身份 / 职业身份</label><div class="tags" id="userSocialIdentity"></div>
+    <label>User 的社会位置 / 阵营关系</label><div class="tags" id="userWorldPosition"></div>
+    <label>User 的特殊性 / 隐藏点</label><div class="tags" id="userSpecialness"></div>
+    <div class="row3">
+      <div><label>世界观完整度</label><select id="worldDetailLevel"><option>轻背景：只服务氛围</option><option>中背景：影响身份与关系</option><option selected>完整背景：规则、阶层、日常、冲突都清楚</option><option>设定集级：历史、制度、势力、暗线完整展开</option></select></div>
+      <div><label>User 与世界绑定度</label><select id="worldBond"><option>低：User可脱离世界存在</option><option>中：世界影响User选择</option><option selected>高：User命运与世界规则强绑定</option><option>极高：User本身就是世界冲突核心</option></select></div>
+      <div><label>世界风格</label><select id="worldTone"><option>日常生活感</option><option selected>细腻沉浸</option><option>女性向小说感</option><option>高张力剧情</option><option>暗流涌动</option><option>浪漫治愈</option><option>悬疑压迫</option></select></div>
+    </div>
+    <label>自定义世界观 / User 位置</label>
+    <textarea id="customWorld" class="midtextarea" placeholder="例：现代都市合租公寓，表面是普通熟人群，实际每个人都因为一次雨夜事件和user产生联系；user是群里的情绪锚点，但她自己并不知道。"></textarea>
+  </div>
+
+  <div class="card">
+    <div class="tape blue"></div>
+    <div class="title">③ User 多层人格设定 <span class="pillnote blue">核心</span></div>
+    <label>表层人格：别人第一眼看到的样子</label><div class="tags" id="personaSurface"></div>
+    <label>中层行为：长期相处后的稳定表现</label><div class="tags" id="personaMiddle"></div>
+    <label>深层核心：真正渴望 / 恐惧 / 软肋</label><div class="tags" id="personaCore"></div>
+    <label>人格矛盾：最吸引人的反差</label><div class="tags" id="personaConflict"></div>
+    <label>缺点 / 不完美</label><div class="tags" id="personaFlaws"></div>
+    <label>情绪防御机制</label><div class="tags" id="defenseMode"></div>
+    <label>成长线</label><div class="tags" id="growthArc"></div>
+    <label>自定义人格</label><textarea id="customPersona" placeholder="例：她不是真的冷淡，只是很怕自己太需要别人；她会认真听所有人的话，但不会轻易把自己的难过说出口。"></textarea>
+  </div>
+
+  <div class="card">
+    <div class="tape"></div>
+    <div class="title">④ 外貌与气质</div>
+    <label>整体气质</label><div class="tags" id="appearanceAura"></div>
+    <label>脸部 / 眼睛 / 发型标签</label><div class="tags" id="appearanceFace"></div>
+    <label>身材 / 体态标签</label><div class="tags" id="appearanceBody"></div>
+    <label>穿搭风格</label><div class="tags" id="appearanceStyle"></div>
+    <label>感官记忆点</label><div class="tags" id="sensoryDetails"></div>
+    <label>自定义外貌</label><textarea id="customAppearance" placeholder="例：普通但很耐看，笑起来眼睛弯；也可以是明艳浓颜、清冷淡颜、温柔姐姐感等。写她第一眼记忆点、熟人才知道的小细节、穿搭、声音和气味。"></textarea>
+  </div>
+
+  <div class="card">
+    <div class="tape blue"></div>
+    <div class="title">⑤ 爱好、生活细节与日常</div>
+    <label>表层爱好</label><div class="tags" id="hobbySurface"></div>
+    <label>私密爱好 / 小众偏好</label><div class="tags" id="hobbyPrivate"></div>
+    <label>日常生活状态</label><div class="tags" id="dailyLife"></div>
+    <label>独处习惯</label><div class="tags" id="aloneHabit"></div>
+    <label>压力下行为</label><div class="tags" id="stressBehavior"></div>
+    <label>房间 / 社交平台 / 手机习惯</label><div class="tags" id="lifeTexture"></div>
+    <label>自定义生活细节</label><textarea id="customLife" placeholder="例：会保存电影票根；压力大时整理书桌；喜欢在深夜听同一首歌；社交平台只发风景和猫。"></textarea>
+  </div>
+
+  <div class="card">
+    <div class="tape"></div>
+    <div class="title">⑥ 关系吸引力与亲密模式</div>
+    <label>User 吸引人的地方</label><div class="tags" id="attractionSource"></div>
+    <label>容易让哪类角色破防</label><div class="tags" id="breakType"></div>
+    <label>亲密关系需求</label><div class="tags" id="relationshipNeeds"></div>
+    <label>容易心动 / 被打动触发点</label><div class="tags" id="attractionTrigger"></div>
+    <label>表达爱的方式</label><div class="tags" id="loveLanguage"></div>
+    <label>被偏爱时的反应</label><div class="tags" id="favoredResponse"></div>
+    <label>冲突与和好模式</label><div class="tags" id="repairMode"></div>
+    <label>关系边界</label><div class="tags" id="relationshipBoundary"></div>
+    <label>与不同角色类型的化学反应</label><div class="tags" id="chemistryType"></div>
+    <label>自定义关系设定</label><textarea id="customRelationship" placeholder="例：她会被坚定选择打动，但不喜欢被强行安排；她需要被理解，而不是被当成需要拯救的人。"></textarea>
+  </div>
+
+  <div class="card">
+    <div class="tape blue"></div>
+    <div class="title">⑦ 输出控制</div>
+    <div class="row3">
+      <div><label>输出丰富度</label><select id="richness"><option>标准完整</option><option selected>非常完整</option><option>极其完整，接近长篇User设定集</option></select></div>
+      <div><label>示例数量</label><select id="exampleCount"><option>2组</option><option selected>4组</option><option>6组</option></select></div>
+      <div><label>输出风格</label><select id="outputStyle"><option selected>User人设卡格式，标题清晰</option><option>小说女主设定集风格</option><option>群聊中心位User格式</option><option>AI小手机User面具格式</option><option>Yaml风格，方便导入</option></select></div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="tape"></div>
+    <div class="title">📦 导出与存档</div>
+    <div class="row4">
+      <button class="btn-white" onclick="exportCurrent('txt')">📄 导出 TXT</button>
+      <button class="btn-blue" onclick="exportCurrent('md')">📝 导出 MD</button>
+      <button class="btn-green" onclick="exportCurrent('doc')">📘 导出 Word</button>
+      <button class="btn-gold" onclick="exportCurrent('json')">🗂️ 导出 JSON</button>
+    </div>
+    <div class="row" style="margin-top:14px">
+      <button class="btn-white" onclick="exportAllSaves()">📦 导出全部存档</button>
+      <button class="btn-primary" onclick="triggerImport()">📥 导入存档 JSON</button>
+    </div>
+    <input id="importFile" class="file-input" type="file" accept=".json,application/json" onchange="importSaves(event)">
+  </div>
+
+  <div class="card">
+    <div class="tape blue"></div>
+    <div class="title">✨ 生成结果</div>
+    <div id="out" class="output placeholder">点击底部「✨ 生成 User 人设」开始生成。</div>
+  </div>
+
+  <div class="card">
+    <div class="tape"></div>
+    <div class="title">📂 本地存档</div>
+    <div id="saves" class="small">暂无存档</div>
+  </div>
+</div>
+
+<div class="bar">
+  <button class="btn-blue" onclick="copyText()">📋 复制</button>
+  <button class="btn-green" onclick="saveText()">💾 存档</button>
+  <button class="btn-gold" onclick="downloadSelf()">⬇️ 下载本工具</button>
+  <button class="btn-white" onclick="copyPromptOnly()">🧾 复制提示词</button>
+  <button class="btn-primary" id="genBtn" onclick="generate()">✨ 生成 User 人设</button>
+</div>
+<div class="toast" id="toast"></div>
+
+<script>
+var TAGS={
+  worldType:["现代都市","现代校园","现代职场","现代娱乐圈","现代豪门","现代医疗/心理咨询","现代刑侦/悬疑","现代律政/法务","现代艺术圈","现代电竞直播","现代港圈名流","同居屋檐下","合租公寓","公寓邻里群","小镇熟人社会","海边小城","大学宿舍","书店/咖啡店日常","花店/甜品店日常","图书馆/博物馆日常","旅行民宿/短住关系","破镜重圆关系网","暗恋群像关系网","女性向都市群像","女性向校园群像","女性向娱乐圈群像","女性向职场群像","女性向古风群像","豪门家族群像","古代架空","古风世家","宫廷权谋","女尊世界","江湖武侠","仙侠修真","西幻魔法学院","神明共存","人外共存","兽人隐匿世界","吸血鬼/恶魔共存","捉鬼师世界","异能监管","ABO世界","哨兵向导","AI仿生人社会","赛博朋克都市","未来星际","末日基地","无限流副本","快穿位面","梦境/记忆世界","时间循环世界","平行世界重逢"],
+  worldSubType:["校园青春","晚自习与天台","图书馆偶遇","社团活动","学生会/风纪会","大学选课与小组作业","女生宿舍夜聊","合租公寓日常","邻居互助","下班后夜宵局","办公室暧昧避嫌","职场搭档","项目组长期合作","书店常客关系","咖啡店熟人局","小镇旧识","雨夜救场","契约同居","契约婚约","商业联姻","豪门家族","继承权暗流","港圈名流社交","娱乐圈曝光","练习室后台","剧组同住","偶像粉丝边界","电竞基地日常","直播间事故","心理咨询边界","医院夜班","刑侦案件牵引","律所攻防","宫廷权谋","世家门阀","师徒宗门","女尊朝堂","江湖门派","魔法学院","神明信徒","人外共存","兽人身份隐藏","吸血鬼契约","能力者登记制度","异能等级","捉鬼师家族","灵魂绑定","契约关系","ABO信息素","哨向精神链接","末日资源秩序","基地分区制度","副本规则","世界线修正","记忆篡改","身份伪装","预言/任务中心","时间循环","重逢但记忆不同","破镜重圆关系网","双向暗恋误会","年上照顾","年下直球","青梅竹马重逢","修罗场但不狗血","群友看破不说破"],
+  worldKeywords:["阶级差","身份差","权力差","年龄差","距离感","舆论压力","家族压力","校园规则","宿舍规则","职场伦理","职业保密","公众凝视","粉丝审视","同住边界","暧昧避嫌","熟人起哄","暗恋旁观者","群友看破不说破","饭局座位安排","雨夜接送","称呼变化","日常偏爱","关系临界点","旧伤复燃","不能说的秘密","秘密档案","身份暴露风险","组织监管","普通人日常","外部危机","隐藏暗线","长期主线","创伤旧事","公众面具","私下真实","被坚定选择","被误解","被保护也想独立","自由与归属冲突","被需要与自我消耗","旧关系阴影","替身误会","救命之恩","共同秘密","共同居住痕迹","深夜消息","撤回的消息","朋友圈可见范围","社交距离","安全屋/避风港","世界规则代价","能力失控风险","记忆缺口","命运绑定","契约代价","家族旧债","普通生活被打破"],
+  worldFunction:["提供生活氛围","制造身份差","制造关系禁忌","制造外部阻碍","制造隐藏秘密","制造主线危机","制造群像关系","制造职业压力","制造舆论压力","制造本能冲突","制造长期陪伴日常","让User成为关系中心","让User被多个角色看见","让User必须成长","让User在普通生活中被偏爱","让User背负秘密","让User在熟人社会中被误解","让User在规则边界内选择自己","让User成为团队情绪锚点","让User成为世界异常的钥匙","让User拥有不能公开的身份","让User在日常与危机之间切换","让User和角色共享秘密","让User被迫面对旧关系","让User在群像中保留主体性","让User通过小事改变别人","让User从被保护走向并肩"],
+  worldDailyTexture:["合租客厅的暖灯","玄关多出来的伞","门口挂着的备用钥匙","小区门口早餐摊","便利店深夜饭团","奶茶店第二杯半糖","女生寝室夜聊氛围","学校走廊和晚自习","操场看台的风","图书馆靠窗座位","自习室占座便签","公司茶水间和加班夜","电梯里短暂沉默","下班后的夜宵摊","练习室镜子与汗水","剧组化妆间灯泡","后台走廊的消毒水和香水味","咖啡店靠窗桌","书店打烊后的灯","旧书页和木地板","花店清晨进货","甜品店雨天打烊","古风院落檐下雨","回廊灯笼和薄雪","雨夜出租车后座","天台风和自动贩卖机","群里发错消息又撤回","深夜突然的语音通话","旧城区小巷和路灯","医院夜班和消毒水味","警局值班室和案卷","律所深夜打印机","电竞基地训练室灯光","直播间下播后的静音","海边小城的潮湿风","民宿走廊的木香","末日基地广播声","副本倒计时提示音","魔法学院钟楼","异能登记大厅","仿生人维修区蓝光","星舰舷窗外的星河"],
+  userSocialIdentity:["普通女大学生","高中转校生","研究生/学术新人","初入职场新人","成熟职场女性","自由职业者","插画师/设计师","小说作者/编剧","摄影师/艺术从业者","书店/咖啡店店主","花店/甜品店店员","心理咨询来访者","医生/护士/医学生","律师助理/法学生","记者/编辑","演员/练习生","女团成员/偶像","经纪人助理","电竞运营/解说","游戏主播","项目负责人","家族养女/世交小姐","豪门边缘人","没落世家小姐","古风贵女","女尊世界贵女","江湖门派弟子","宗门小师妹","捉鬼师后人","异能登记对象","普通人中的规则例外","契约另一方","神明唯一信徒","人外伴侣候选","末日基地后勤","无限流新人玩家","快穿任务者","仿生人观察对象","星际军校生","隐藏身份持有者"],
+  userWorldPosition:["普通人却是情感中心","新来的转校生/插班生","合租屋的新住户","被委托照顾的人","被众人保护但不脆弱","团队里的新成员","家族中的边缘人","旧关系的归来者","公众人物身边的普通人","世界规则的例外","隐藏身份持有者","关键事件幸存者","被误认为无害的人","组织监管对象","契约另一方","神明/人外唯一在意的人","群像关系的锚点","被所有人看破不说破地偏心"],
+  userSpecialness:["能让冷淡角色破例","能让年下小狗安静下来","能让爹系角色失控心软","能让疯批角色学会克制","能看见别人没说出口的情绪","会记住别人随口一句话","表面普通但很难替代","不是最耀眼但最让人安心","在关键时刻很倔","被需要时会站出来","有自己都没意识到的吸引力","对善意迟钝","对恶意敏感","隐藏旧伤","隐藏身份","与世界规则天然冲突","是某个预言/任务/契约的中心"],
+
+  personaSurface:["温和礼貌","清冷疏离","活泼明亮","慢热安静","嘴硬傲娇","松弛随性","骄纵但不坏","理性克制","钓系自然","普通生活感","懂事省心","看起来很好接近","看起来不太好惹","清醒独立","温柔姐姐感","少女感","大小姐感","小白花但有刺","明媚小太阳","安静观察者","甜妹但有边界","冷感但不刻薄","软糯但不软弱","外向社交型","内向慢热型","礼貌距离感","自然亲和力","微妙疏离感","有点笨拙","有点狡黠","会装没事","人群里不抢眼但耐看","一眼让人想靠近","像普通人却很有记忆点"],
+  personaMiddle:["会照顾别人","习惯忍耐","嘴上不说但记得很清楚","怕麻烦别人","遇事先自己扛","喜欢用玩笑带过情绪","需要安全感但不主动要","边界感很强","会给别人留台阶","擅长察言观色","不轻易依赖","会默默回报善意","对喜欢的人会变笨拙","讨厌被安排","遇到压力会先整理事情","会把脆弱藏进日常动作","会认真听人说话","越难过越平静","不喜欢欠人情","会先确认对方是否为难","会用小礼物表达感谢","会把喜欢藏在顺手里","越在意越不敢问","会在群里观察气氛","会在关键时刻站出来","会替别人圆场","会记住称呼变化","会对不舒服的关系慢慢后退","会对熟人露出幼稚面","会在深夜变得坦诚","会把重要的人放进日常规划"],
+  personaCore:["害怕被抛下","渴望被坚定选择","想被看见真实一面","害怕失控","渴望自由","需要被偏爱","亲密关系慢热","表面独立内心很软","想被允许不懂事","害怕给别人添麻烦","对归属感有执念","害怕被替代","不相信无条件的喜欢","渴望有人听懂她的沉默","很想被照顾但不敢开口","害怕自己不够特别","想成为自己的主人","害怕依赖之后失去","害怕被看穿脆弱","害怕热闹之后只剩自己","渴望被记住小事","渴望有人站在她这边","想要亲密但怕被吞没","想被爱但不想失去边界","想被需要但不想被消耗","想拥有普通安稳的生活","想证明自己不是谁的附属","想在关系里保留自我"],
+  personaConflict:["看似温柔其实边界很硬","看似普通却很难真正走近","看似钓系其实纯情","看似骄纵其实缺安全感","看似冷淡其实很容易心软","看似懂事其实很想被哄","看似独立其实会偷偷期待被接住","看似随和其实很有原则","看似迟钝其实什么都知道","看似不在意其实记很久","看似热闹其实独处很多","看似会爱人其实不擅长被爱","看似软糯其实关键时刻很倔","看似好说话其实底线明确","看似成熟其实也会幼稚吃醋","看似清醒其实会为喜欢的人犯傻","看似没脾气其实会悄悄疏远","看似社交自在其实很怕麻烦别人","看似被动其实会选择性靠近","看似普通日常其实是很多人的例外"],
+  personaFlaws:["容易逞强","不擅长求助","有时过度体谅别人","嘴硬","容易逃避正面沟通","安全感不足","心软但装冷静","容易内耗","不愿麻烦人导致误会","对自己的需求迟钝","偶尔任性","偶尔情绪化","很会忍但忍到爆发","容易把偏爱当成礼貌","不太相信自己值得被爱","生气时会沉默","容易拖延重要决定","被喜欢时会退一步确认","偶尔口是心非","习惯先道歉","会把不开心憋到很晚才说","对熟人有点小脾气","缺乏安全感时会反复确认","不喜欢解释太多导致误会","容易因为细节心软","有时太要面子","越难过越装正常"],
+  defenseMode:["开玩笑转移话题","假装没事","先照顾别人再处理自己","沉默冷处理","把情绪写进备忘录","突然变得礼貌","离开现场冷静","整理房间恢复秩序","用忙碌压住情绪","说反话试探","装作不需要","故意变得很独立","用理性分析替代哭","只发一个很短的消息"],
+  growthArc:["从不敢依赖到学会开口","从过度懂事到允许自己被爱","从逃避亲密到接受偏爱","从被世界推着走到主动选择","从隐藏自我到被看见真实","从讨好安全感到建立边界","从普通生活走向故事中心","从被保护者变成能并肩的人","从迷茫到明确想要什么","从怕麻烦别人到学会互相需要"],
+
+  appearanceAura:["普通但舒服","普通但耐看","干净感","生活化亲切感","邻家生活感","耐看淡颜","清冷淡颜","明艳浓颜","温柔淡颜","明媚甜感","盐系清爽","氧气感","书卷气","文艺感","松弛感","钓系松弛感","猫系","犬系","狐狸系","兔系柔软感","小鹿感","小白花但有刺","大小姐感","病弱感","元气感","冷感美人","温柔姐姐感","少女感","成熟感","姐姐感","妹妹感","普通人里的微光","不张扬的漂亮","越看越有味道","第一眼安静第二眼动人","故事感","破碎感","优雅感","柔软但有锋芒","清透感","温吞感","倔强感","慵懒感","高级感","烟火气","被生活养出来的温柔","被偏爱才会露出的可爱"],
+  appearanceFace:["杏眼","圆杏眼","狐狸眼","圆眼","下垂眼","猫眼","桃花眼","丹凤眼","内双","单眼皮","眼尾微微上挑","眼尾微垂","眼神清亮","眼神安静","眼神有距离感","看人很认真","笑起来眼睛弯","不笑时有点冷","浅色瞳","黑色瞳孔很亮","眼下痣","泪痣","鼻梁清秀","鼻尖小巧","侧脸干净","脸型柔和","鹅蛋脸","瓜子脸","圆脸幼态","轮廓清晰","下颌线柔和","脸颊有一点软肉","笑起来有梨涡","浅浅酒窝","淡唇色","自然粉唇","红唇","唇形饱满","嘴角自然下垂","嘴角自然上扬","黑长直","齐肩短发","锁骨发","高马尾","低马尾","丸子头","微卷长发","法式刘海","空气刘海","碎发刘海","随手扎发","头发有自然蓬松感","发尾微卷","发色偏黑茶","发色偏栗棕","素颜也清爽","化淡妆更有气色","认真时会抿嘴","害羞时耳尖发红"],
+  appearanceBody:["清瘦单薄","清瘦但不脆弱","高挑纤细","小个子灵动","娇小但有存在感","骨肉匀称","微肉感","健康匀称","肩颈漂亮","锁骨明显","天鹅颈","直角肩但不夸张","腰线自然","手臂线条柔和","手指修长","手很小","指节干净","腿型漂亮","走路很轻","走路带一点懒散","体态松弛","站姿很直","坐姿放松","容易脸红","耳朵容易红","冷白皮","暖白皮","自然肤色","健康小麦色","皮肤有生活感","有运动痕迹","柔软感","轻微疲惫感","不刻意的生活感","普通女孩的真实体态","穿宽松衣服更好看","穿简单衣服也干净","靠近时有温度感","不完美但很真实","笑起来整个人会变软"],
+  appearanceStyle:["宽松针织衫","软糯毛衣","白衬衫","简单T恤","牛仔裤和帆布鞋","卫衣和运动裤","针织开衫","吊带加开衫","长裙和薄外套","半身裙和乐福鞋","衬衫裙","风衣和围巾","法式复古","新中式","极简冷淡风","甜妹风","学院风","运动休闲","职场通勤","温柔通勤风","轻熟姐姐风","普通大学生日常穿搭","邻家女孩穿搭","周末随性穿搭","浅色系穿搭","黑白灰衣橱","低饱和色系","奶油色系","雾蓝/豆沙/燕麦色","喜欢柔软面料","不追潮流但会搭配","总带一件外套","有一件反复穿的旧衣服","鞋子干净但不昂贵","包里东西很多","喜欢小发夹","喜欢细项链","喜欢耳钉","手腕常有发绳","穿搭有一点小巧思","正式场合会认真打扮","在熟人面前穿得更放松","雨天会带透明伞","冬天会把自己裹得很暖"],
+  sensoryDetails:["白茶香","皂角香","洗衣液清香","雨后青草味","淡淡奶香","书页和墨水味","咖啡苦香","柑橘香","杏仁微苦气息","护手霜味","薄荷糖味","冬天围巾上的暖味","声音偏软","声音清冷","声音有一点鼻音","声音很轻但清楚","笑声很轻","笑起来会先吸一口气","说话前会停顿","紧张时语速变快","低落时回复很短","有固定的小饰品","随身带发绳","包里总有糖","包里有纸巾和创可贴","手机壳很有记忆点","钥匙扣很幼稚","手腕有旧发绳","常用同一支口红/润唇膏","身上有阳光晒过的衣物味","靠近时有很干净的体温感","指尖常有护手霜味","标志物是一枚小耳钉","标志物是一条旧围巾","标志物是常用帆布包"],
+
+  hobbySurface:["阅读", "看电影", "听歌", "逛展", "摄影", "做饭", "烘焙", "写日记", "跑步", "瑜伽", "普拉提", "养宠物", "喝奶茶/咖啡", "打游戏", "手作", "画画", "种花", "看综艺", "逛书店", "收集香水", "整理歌单", "看舞台/演唱会", "逛花市", "逛旧货市场", "做手账", "买漂亮杯子", "研究穿搭", "看漫画/轻小说", "追剧", "散步", "拼图", "做甜品", "桌游/剧本杀", "旅行打卡", "学习语言", "练字", "弹琴/乐器", "拍天空照片", "收纳整理", "看女性向小说", "看短篇散文", "读诗集", "看纪录片", "看老电影", "追广播剧/有声书", "逛文创市集", "探店但不爱打卡", "做咖啡/手冲", "研究茶饮", "泡茶", "养多肉/绿植", "插花", "做香薰蜡烛", "织围巾/钩针", "拼乐高/模型", "跳舞/练舞", "游泳", "爬山", "骑行", "滑冰/滑板", "打羽毛球", "逛超市", "逛便利店新品", "做便当", "研究低卡食谱", "写小说/同人", "写人物小传", "剪视频", "修图排版", "做相册", "整理照片", "逛博物馆", "去海边/湖边吹风", "去天台看夜景", "和朋友夜宵聊天", "参加读书会", "学习心理学", "学习历史/民俗", "收集明信片", "收藏冰箱贴", "研究口红/香水/护肤", "做美甲/手部护理", "整理衣柜搭配", "给宠物拍照", "给生活做月度总结", "周末睡懒觉后慢慢做早餐"],
+  hobbyPrivate:["收藏票根", "保存聊天截图", "深夜循环同一首歌", "写不会发出去的长文", "收集奇怪小物", "研究星座/塔罗但嘴上不承认", "喜欢观察路人", "给每段时期做歌单", "给喜欢的人偷偷备注", "拍很多天空照片", "会反复看旧照片", "喜欢在便利店买固定口味饮料", "偷偷练习怎么撒娇", "会记下别人喜欢吃什么", "收藏可爱的贴纸", "保存别人发来的语音", "给重要日子做倒计时", "看恋爱小说时偷偷代入", "喜欢闻新书味", "给情绪取奇怪名字", "把想说的话写进备忘录", "收藏漂亮包装纸", "偷偷关注对方动态", "反复调整聊天置顶", "给自己的生活做小仪式", "压力大时研究食谱但不一定做", "喜欢夜里看城市灯光", "把收到的小礼物收得很认真", "把没送出去的礼物藏起来", "给喜欢的人准备但不一定送的小东西", "在备忘录写对方说过的话", "把重要聊天截屏放进隐藏相册", "偷偷练习对视和告白台词", "给未来某天写信", "把不同关系阶段做成歌单", "收藏对方随口提过的店铺", "给自己设定小奖励机制", "把喜欢的人名字写进草稿又删掉", "会偷偷看已读/未读状态", "在购物车里放很久的东西", "收藏很多房间布置图", "看恋爱片段会暂停发呆", "把情绪写成很短的句子", "有只属于自己的睡前仪式", "喜欢在深夜翻旧朋友圈", "把伤心事做成隐晦动态", "会在日历里记不重要但温柔的小日子", "会保存天气截图", "会收集让自己安心的声音", "收藏别人夸过自己的句子", "在无人处练习如何自然接受夸奖", "对特定气味/布料有依赖", "会给常用物品起名字", "喜欢买一模一样的备用物"],
+  dailyLife:["作息不太稳定", "早上很慢热", "晚上更容易真诚", "喜欢窝在固定角落", "会把房间收拾得很舒服", "桌面有点乱但自己知道在哪", "吃饭口味固定", "容易忘记喝水", "喜欢一个人散步", "讨厌太吵的地方", "会在群里潜水很久", "熟了以后话会变多", "会给自己留小奖励", "有固定通勤路线", "会在路上买同一家店的饮料", "喜欢靠窗坐", "下雨天会变得安静", "会把日程写得很细", "会突然想换房间布局", "对熟人有固定小称呼", "会在睡前回想今天别人说的话", "生病时不太会主动说", "忙起来会忘记吃饭", "出门前反复确认钥匙", "喜欢在包里放备用小物", "每周会有一段独处充电时间", "很珍惜不被打扰的夜晚", "早上会赖床但会给自己留缓冲时间", "洗漱时会放歌", "出门会看天气和温度", "容易被路边小猫小狗吸引", "会因为一家店关门而失落", "喜欢固定座位带来的安全感", "常常买多一份小零食备用", "对常去的店员有礼貌但不熟络", "回家第一件事是换舒服衣服", "会把外套搭在同一个椅背上", "喜欢把灯调成暖色", "房间乱到一定程度会突然大扫除", "会把快递盒攒几天再拆", "会给冰箱贴便签", "睡前会检查门锁/闹钟", "下雨天会把伞晾好", "喜欢边吃饭边看轻松视频", "会把喜欢的杯子留给心情好时用", "容易因为小事开心一整天", "被打乱计划会先沉默", "很少主动说累但动作会变慢", "收到好消息会先截图保存", "和熟人聊天会突然发很多碎碎念", "陌生场合会先观察出口和座位", "会照顾比自己更慌的人", "喜欢在周末把生活节奏放慢", "会给自己安排无意义但治愈的小事"],
+  aloneHabit:["独处时发呆", "一个人看老电影", "整理衣柜", "清理聊天记录但舍不得删重要的", "抱着枕头听歌", "把灯开得很暗", "写备忘录", "给未来的自己留言", "做饭给自己吃", "点外卖但吃不完", "深夜看窗外", "反复洗杯子", "翻旧书", "给宠物/植物说话", "窝在床上刷很久但什么都没看进去", "把喜欢的歌单从头听到尾", "给房间换香薰", "整理相册分类", "把旧物重新摆一遍", "泡一杯饮料放到变凉", "洗完澡后在镜子前发呆", "一个人去便利店买夜宵", "把未完成的心事写成清单", "看天气预报规划不存在的出门", "练习不带情绪地回复消息", "把想念压进日记", "给自己做很简单的一餐", "在阳台/窗边坐很久", "抱着毛毯看剧", "给自己拍不发出去的照片", "复盘白天一句话是不是说错了", "把礼物包装拆开又重新收好", "给喜欢的人打字又删除", "在安静时突然想起很多细节", "用小仪式结束一天", "把心情不好的衣服洗掉", "一边收纳一边恢复情绪", "独自逛书店但不买书", "独自去常去的咖啡店坐角落", "睡前给自己一句很短的安慰"],
+  stressBehavior:["疯狂整理房间", "突然很安静", "反复确认消息", "睡很久", "吃很少", "想吃甜的", "变得过度礼貌", "逃避社交", "开始列清单", "用工作/学习麻痹自己", "会掉眼泪但不出声", "情绪上来会先离开", "想被抱但不说", "会说没事", "开始反复洗手/洗杯子", "把手机调成勿扰", "回复变得很短", "突然不发动态", "疯狂刷无意义内容", "买很多小东西安抚自己", "把所有事情排成时间表", "对声音和灯光变敏感", "忍到最后才崩溃", "会躲进卫生间/楼梯间冷静", "会把负面情绪写下来再删", "会强迫自己看起来正常", "容易胃口变化", "容易失眠但不告诉别人", "开始反复检查门窗/消息", "对熟人撒一点小脾气后又后悔", "会用开玩笑掩盖焦虑", "会突然想回家/想见熟悉的人", "会不自觉咬唇/抠手", "会把自己藏进宽松外套里", "需要一杯热饮或甜食缓冲", "会想独处但又怕没人发现", "会把重要决定往后拖", "会在深夜突然坦白一点点", "会把求助包装成随口一问", "压力过去后会补偿性睡觉或吃东西"],
+  lifeTexture:["房间有暖灯", "床边放书", "桌上有便利贴", "社交平台只发风景", "朋友圈三天可见", "头像很久不换", "手机备忘录很多", "相册里很多截图", "包里总有纸巾和糖", "会保存小票", "喜欢买漂亮杯子", "有一条常用毯子", "常去同一家咖啡店", "喜欢靠窗座位", "耳机常年缠在包里", "床头有小夜灯", "桌面有未喝完的水杯", "衣柜按颜色粗略分类", "有一格抽屉专门放纪念物", "手机壳会用很久", "锁屏是风景/宠物/模糊照片", "有固定外卖店铺", "常用表情包有自己的风格", "聊天置顶很少但很认真", "收藏夹里全是以后想去的地方", "备忘录标题乱但内容很细", "喜欢把重要文件命名得很清楚", "房间角落有柔软抱枕", "书桌上有香薰/护手霜", "冰箱里有固定饮料", "玄关有备用伞", "包里有创可贴和备用发绳", "床边有充电线和耳机", "会把票根夹进书里", "喜欢用同一款笔", "有很多没用完的本子", "会给不同场景设置不同歌单", "社交平台动态克制但有生活气", "会发“今天的云/灯/路边花”", "手机输入法记得很多常用语气词", "有只给熟人的私密小号", "会定期清理桌面但留下情绪物件", "家里有一种固定气味", "椅背总搭着一件常穿外套", "常去的路线有她自己的小地图", "朋友圈不常发人像但偶尔发背影/影子", "收藏着想送人的链接", "有一个不让别人随便碰的盒子"],
+  attractionSource:["认真听人说话","能让人感到被看见","会记住别人随口一句话","不轻易依赖所以求助很有重量","对善意反应慢但会认真回报","温柔但有边界","普通日常里有稳定感","不会刻意讨好却让人安心","会把别人的情绪放在心上","被冒犯时也能守住自己","有自己的生活节奏和小世界","会在关键时刻站出来","看似柔软但不容易被改变","让缺爱型角色感到被认真对待","让强势型角色学会放轻声音","让冷淡型角色产生例外感","让年下直球型角色想被她夸奖","让成熟年上型角色想把她纳入日常","她的沉默会让人想靠近而不是放弃","她的拒绝有礼貌但很清楚","她不完美却真实","她在小事里给出持续的温柔","她能接住别人的狼狈","她不把偏爱当理所当然","她会让人产生回家的感觉"],
+  breakType:["冷脸克制型","年下小狗型","爹系照顾型","嘴欠气氛组","高岭之花型","病弱绿茶型","海王收心型","前任破镜型","沉默艺术家型","正直保护型","疯批但守边界型","人外忠犬型","傲娇猫系型","成熟年上型","同桌暗恋型","群聊军师型","正直警察/军人型","温柔医生型","毒舌学霸型","同住邻居型","忠犬兽人型","清冷爱豆/演员型","电竞前任型","年上引导型","嘴硬竹马型","安静艺术家型","伪装轻浮实则深情型","绿茶示弱型","高攻高防反撩型","阴郁但会行动型","全员群像助攻型"],
+  relationshipNeeds:["被坚定选择","被认真倾听","被允许脆弱","被尊重边界","被温柔接住","被看见真实","需要稳定回应","需要一点偏爱","需要自由空间","需要慢慢来","需要对方主动但不过界","需要明确承诺","需要日常陪伴","需要不被审判","需要有人记得她的小事","需要被偏爱但不被控制","需要被保护但不被弱化","需要能说废话的安全感","需要有事可以直接说的关系","需要冲突后有人愿意沟通","需要对方给出具体行动而不只是情话","需要被尊重选择和节奏","需要关系里仍保留自我","需要对方看懂她没说出口的累","需要有人在热闹散场后还记得她","需要被认真介绍给朋友/世界","需要被坚定站队","需要被允许偶尔任性","需要亲密也有呼吸感"],
+  attractionTrigger:["对方记得她随口一句话","对方没有逼问但一直在","对方替她挡掉尴尬","对方在她逞强时递台阶","对方尊重她说不要","对方把她的沉默当作需要陪伴而不是冷淡","对方公开场合维护她","对方私下认真解释误会","对方不催她回应但持续稳定","对方把偏爱落在具体小事","对方看见她不完美仍留下","对方愿意等她慢慢开口","对方在她低落时不讲大道理","对方把选择权交给她","对方记住她的边界","对方在危机里先确认她的感受","对方愿意为她改变一个小习惯","对方能接住她的试探和退缩","对方没有把她当需要拯救的对象","对方在她害怕麻烦别人时主动说我来"],
+  loveLanguage:["记住细节","陪伴但不打扰","做实际的事","分享日常","轻轻撒娇","用玩笑试探","送小东西","写很长的话但不一定发","主动报备","给对方留位置","在别人面前维护","在私下认真解释","用沉默陪伴","把喜欢藏在顺手里","给对方留喜欢吃的东西","记住对方的忌口和习惯","主动问今天怎么样","把重要日子写进日历","发路上看到的小事","在群里自然接住对方的话","用行动道歉","认真听完再给建议","给对方留独处空间","在对方忙时不添乱","用很轻的称呼表达亲近","把担心包装成顺路","把想念藏进分享里","用备忘录记录对方说过的话"],
+  favoredResponse:["第一反应是不敢确认","会假装镇定但耳尖发红","会嘴上说不用其实记很久","会把收到的偏爱认真回赠","会反复确认是不是只对她这样","会因为一点小事开心很久","会突然变得话多","会小心翼翼地靠近一点","会把这件事写进备忘录","会在之后用行动回报","会不好意思直视对方","会嘴硬说还好但语气变软","会把偏爱当作珍贵证据保存","会开始在日常里给对方留位置","会试探性撒娇","会放下部分防备","会在熟人面前更自然","会变得更愿意求助","会因为被坚定选择而慢慢变勇敢","会把对方纳入未来计划"],
+  repairMode:["冲突后需要冷静时间","愿意沟通但需要对方先给安全感","会先说没事但希望被看出来","不喜欢冷暴力","可以接受争执但不能接受消失","需要具体道歉而不是敷衍哄人","会用做饭/送东西缓和气氛","会写很长的话解释自己","会先退一步但心里会记住","被认真解释后很容易心软","需要对方承认她的感受是真的","不接受翻旧账羞辱","和好后会有一点别扭","会用日常恢复关系而不是立刻亲密","需要一个拥抱但不一定说出口","会因为对方主动找她而破防","关系修复后会更珍惜边界","吵架后会复盘自己哪里没说清","愿意给机会但不会无限退让","最怕对方用沉默惩罚她"],
+  relationshipBoundary:["不接受强迫","不接受公开羞辱","不接受冷暴力","不接受被替代感","不接受不尊重选择","不接受被当成所有物","不接受越界试探","不接受敷衍","不喜欢被安排人生","需要明确同意","需要慢热推进","需要保留自我空间","亲密关系也要有边界","偏爱可以但不能窒息","不接受用爱之名控制社交","不接受未经允许公开关系细节","不接受被拿来比较","不接受把她的退让当理所当然","不接受情绪勒索","不接受玩笑式贬低","不接受一边暧昧一边不给答案","不接受重要事情被隐瞒","不接受被迫快速进入亲密","需要冲突后有解释和复盘","需要被当成平等的人而不是奖品"],
+  chemistryType:["和冷脸角色：她让对方学会主动","和年下小狗：她被对方直球打乱节奏","和爹系角色：她学会被照顾也不失去自己","和嘴欠角色：互怼里藏偏爱","和高岭之花：她是唯一例外","和海王收心：她让职业化温柔变成真心","和前任：旧伤和余温并存","和人外：她是对方本能选择的归处","和群聊成员：她是被看破不说破的中心位","和疯批守边界型：她让对方学会克制","和正直保护型：她让对方在原则与私心间找到平衡","和病弱绿茶型：她会心软但也会立边界","和傲娇猫系：她会看穿口是心非但不拆穿太狠","和成熟年上：她被托底也被鼓励成长","和毒舌学霸：她让对方把关心说成顺便","和同住邻居：日常琐事慢慢变成偏爱","和娱乐圈角色：她是对方公众面具外的私人真实","和电竞/主播角色：她是对方赛后最想报平安的人","和沉默艺术家：她看懂对方没说出口的作品","和群像关系网：她让不同角色在她面前暴露各自偏心"],
+
+  outputBlocks:["一句话User钩子","基础信息","完整世界观","User世界位置","外貌与气质","多层人格","成长经历","家庭/社交背景","生活细节","爱好与习惯","情绪模式","亲密关系模式","吸引力来源","与不同角色类型的化学反应","适合剧情开场","User说话风格","User示例发言","角色生成器联动版","群聊生成器联动版","压缩导入版"]
+};
+
+var selected={};
+Object.keys(TAGS).forEach(function(k){selected[k]=[]});
+selected.worldType=["现代都市","同居屋檐下"];
+selected.worldSubType=["合租公寓日常","双向暗恋误会"];
+selected.worldKeywords=["同住边界","日常偏爱","关系临界点"];
+selected.worldFunction=["提供生活氛围","让User成为关系中心"];
+selected.worldDailyTexture=["合租客厅的暖灯","群里发错消息又撤回"];
+selected.userSocialIdentity=["普通女大学生","普通人中的规则例外"];
+selected.userWorldPosition=["普通人却是情感中心"];
+selected.userSpecialness=["能让冷淡角色破例","会记住别人随口一句话"];
+selected.personaSurface=["温和礼貌","普通生活感"];
+selected.personaMiddle=["会照顾别人","怕麻烦别人"];
+selected.personaCore=["渴望被坚定选择","表面独立内心很软"];
+selected.personaConflict=["看似懂事其实很想被哄"];
+selected.personaFlaws=["容易逞强","不擅长求助"];
+selected.defenseMode=["假装没事","开玩笑转移话题"];
+selected.growthArc=["从过度懂事到允许自己被爱"];
+selected.appearanceAura=["邻家生活感","干净感"];
+selected.appearanceFace=["看人很认真","笑起来眼睛弯"];
+selected.appearanceBody=["骨肉匀称","体态松弛"];
+selected.appearanceStyle=["宽松针织衫","低饱和色系"];
+selected.sensoryDetails=["白茶香","声音偏软"];
+selected.hobbySurface=["阅读","听歌"];
+selected.hobbyPrivate=["保存聊天截图","给每段时期做歌单"];
+selected.dailyLife=["晚上更容易真诚","喜欢窝在固定角落"];
+selected.aloneHabit=["写备忘录","抱着枕头听歌"];
+selected.stressBehavior=["突然很安静","会说没事"];
+selected.lifeTexture=["手机备忘录很多","房间有暖灯"];
+selected.attractionSource=["认真听人说话","能让人感到被看见"];
+selected.breakType=["冷脸克制型","年下小狗型"];
+selected.relationshipNeeds=["被坚定选择","被尊重边界","需要稳定回应"];
+selected.attractionTrigger=["对方记得她随口一句话","对方尊重她说不要"];
+selected.loveLanguage=["记住细节","陪伴但不打扰"];
+selected.favoredResponse=["第一反应是不敢确认","会把收到的偏爱认真回赠"];
+selected.repairMode=["不喜欢冷暴力","需要具体道歉而不是敷衍哄人"];
+selected.relationshipBoundary=["需要慢热推进","亲密关系也要有边界"];
+selected.chemistryType=["和冷脸角色：她让对方学会主动","和群聊成员：她是被看破不说破的中心位"];
+
+var result="";
+var saves=[];
+var lastPrompt="";
+function el(id){return document.getElementById(id)}
+function val(id){var x=el(id);return x?x.value:""}
+function showToast(t){var x=el("toast");x.innerText="🐾 "+t;x.style.display="block";setTimeout(function(){x.style.display="none"},2300)}
+function renderTags(id){var box=el(id);if(!box)return;box.innerHTML="";(TAGS[id]||[]).forEach(function(t){var d=document.createElement("div");d.className="tag"+(selected[id].indexOf(t)>=0?" on":"");d.innerText=t;d.onclick=function(){var arr=selected[id],i=arr.indexOf(t);if(i>=0)arr.splice(i,1);else arr.push(t);renderTags(id)};box.appendChild(d)})}
+function renderAll(){Object.keys(TAGS).forEach(renderTags)}
+function htmlEscape(s){return String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;")}
+function cleanOutput(s){return String(s||"").replace(/```[\s\S]*?```/g,function(m){return m.replace(/```/g,"")}).replace(/\*\*/g,"").replace(/#{1,6}\s*/g,"").replace(/\n{4,}/g,"\n\n\n").trim()}
+function display(s){result=cleanOutput(s);el("out").className="output";el("out").innerHTML=htmlEscape(result).replace(/(【[^】]+】)/g,'<span class="hl">$1</span>')}
+function join(k){return (selected[k]||[]).join("、")||"未指定"}
+function getConfig(){var cfg={userName:val("userName"),userGender:val("userGender"),userAge:val("userAge"),personaType:val("personaType"),goal:val("goal"),extra:val("extra"),worldDetailLevel:val("worldDetailLevel"),worldBond:val("worldBond"),worldTone:val("worldTone"),customWorld:val("customWorld"),customPersona:val("customPersona"),customAppearance:val("customAppearance"),customLife:val("customLife"),customRelationship:val("customRelationship"),richness:val("richness"),exampleCount:val("exampleCount"),outputStyle:val("outputStyle")};Object.keys(TAGS).forEach(function(k){cfg[k]=join(k)});return cfg}
+function applyConfig(cfg){if(!cfg)return;["userName","userGender","userAge","personaType","goal","extra","worldDetailLevel","worldBond","worldTone","customWorld","customPersona","customAppearance","customLife","customRelationship","richness","exampleCount","outputStyle"].forEach(function(f){if(cfg[f]!==undefined&&el(f))el(f).value=cfg[f]});Object.keys(TAGS).forEach(function(k){if(cfg[k])selected[k]=cfg[k]==="未指定"?[]:String(cfg[k]).split("、").filter(Boolean)});renderAll()}
+function safeFileName(name){return String(name||"user_persona").replace(/[\\/:*?"<>|]/g,"_").replace(/\s+/g,"_").slice(0,80)}
+function downloadFile(filename,content,mime){var blob=new Blob([content],{type:mime||"text/plain;charset=utf-8"});var a=document.createElement("a");a.href=URL.createObjectURL(blob);a.download=filename;document.body.appendChild(a);a.click();setTimeout(function(){URL.revokeObjectURL(a.href);a.remove()},300)}
+function exportDoc(baseName){if(!result){showToast("没有内容可导出");return}var html="<html xmlns:o='urn:schemas-microsoft-com:office:office' xmlns:w='urn:schemas-microsoft-com:office:word' xmlns='http://www.w3.org/TR/REC-html40'><head><meta charset='utf-8'><title>User Persona</title><style>body{font-family:'Microsoft YaHei',sans-serif;line-height:1.75;color:#333;}h2{color:#ff7fa8;border-left:5px solid #ff9fbd;padding-left:10px;}</style></head><body>"+htmlEscape(result).replace(/\n/g,"<br>").replace(/(【[^】]+】)/g,"<h2>$1</h2>")+"</body></html>";var blob=new Blob(['\ufeff',html],{type:'application/msword'});var a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=baseName+'.doc';document.body.appendChild(a);a.click();setTimeout(function(){URL.revokeObjectURL(a.href);a.remove()},300)}
+function exportCurrent(type){if(!result){showToast("还没有生成内容哦");return}var cfg=getConfig();var stamp=new Date().toISOString().slice(0,19).replace(/[:T]/g,"-");var base=safeFileName("User人设_"+(cfg.userName||"未命名")+"_"+stamp);if(type==="txt")downloadFile(base+".txt",result,"text/plain;charset=utf-8");else if(type==="md")downloadFile(base+".md","# User人设生成结果\n\n"+result,"text/markdown;charset=utf-8");else if(type==="doc"){exportDoc(base);showToast("已导出 Word");return}else downloadFile(base+".json",JSON.stringify({type:"user-persona-export",version:"1.1",exportedAt:new Date().toISOString(),config:cfg,content:result,prompt:lastPrompt},null,2),"application/json;charset=utf-8");showToast("已导出 "+type.toUpperCase())}
+function downloadSelf(){downloadFile("User人设生成器_V1.1.html",document.documentElement.outerHTML,"text/html;charset=utf-8");showToast("已下载本工具HTML")}
+function exportAllSaves(){downloadFile("user_persona_saves.json",JSON.stringify({type:"user-persona-saves",version:"1.1",exportedAt:new Date().toISOString(),saves:saves},null,2),"application/json;charset=utf-8");showToast("已导出全部存档")}
+function triggerImport(){el("importFile").click()}
+function importSaves(e){var file=e.target.files[0];if(!file)return;var reader=new FileReader();reader.onload=function(){try{var obj=JSON.parse(reader.result);if(obj.type==="user-persona-export"&&obj.config){applyConfig(obj.config);if(obj.content)display(obj.content);showToast("配置与内容恢复成功")}else if(obj.saves){saves=(obj.saves||[]).concat(saves).slice(0,50);localStorage.setItem("user_persona_saves",JSON.stringify(saves));renderSaves();showToast("存档导入成功")}else throw new Error("无法识别的JSON格式")}catch(err){showToast("导入失败");display("导入失败：\n"+err.message)}};reader.readAsText(file);e.target.value=""}
+
+function selectModel(){var v=el("modelSelect").value;if(v)el("model").value=v}
+function saveApi(){localStorage.setItem("up_api_base",val("apiBase"));localStorage.setItem("up_api_key",val("apiKey"));localStorage.setItem("up_model",val("model"));showToast("API设置已保存")}
+function loadApi(){el("apiBase").value=localStorage.getItem("up_api_base")||"https://api.openai.com/v1";el("apiKey").value=localStorage.getItem("up_api_key")||"";el("model").value=localStorage.getItem("up_model")||"gpt-4o-mini"}
+async function fetchModels(){var base=val("apiBase").replace(/\/$/,"");var key=val("apiKey");if(!base||!key){showToast("请先填写API Base URL和Key");return}showToast("正在拉取模型...");try{var res=await fetch(base+"/models",{headers:{"Authorization":"Bearer "+key}});if(!res.ok)throw new Error("模型接口错误："+res.status+" "+(await res.text()).slice(0,200));var data=await res.json();var list=[];if(Array.isArray(data.data))list=data.data.map(function(x){return x.id||x.name||""}).filter(Boolean);else if(Array.isArray(data.models))list=data.models.map(function(x){return typeof x==="string"?x:(x.id||x.name||"")}).filter(Boolean);list=list.filter(function(x,i,a){return x&&a.indexOf(x)===i}).sort();if(!list.length)throw new Error("没有识别到模型列表");el("modelSelect").innerHTML="<option value=''>请选择模型</option>"+list.map(function(m){return "<option value='"+m+"'>"+m+"</option>"}).join("");if(!val("model"))el("model").value=list[0];localStorage.setItem("up_models_cache",JSON.stringify(list));showToast("已拉取 "+list.length+" 个模型")}catch(e){showToast("拉取失败");display("拉取模型失败：\n"+e.message+"\n\n如果是 Failed to fetch，多半是浏览器 CORS 限制，需要后端代理。")}}
+function loadModelCache(){try{var list=JSON.parse(localStorage.getItem("up_models_cache")||"[]");if(list.length)el("modelSelect").innerHTML="<option value=''>请选择模型</option>"+list.map(function(m){return "<option value='"+m+"'>"+m+"</option>"}).join("")}catch(e){}}
+async function callLLM(prompt){var base=val("apiBase").replace(/\/$/,"");var key=val("apiKey");var model=val("model")||"gpt-4o-mini";if(!base||!key)throw new Error("请先填写 API Base URL 和 API Key");var res=await fetch(base+"/chat/completions",{method:"POST",headers:{"Content-Type":"application/json","Authorization":"Bearer "+key},body:JSON.stringify({model:model,messages:[{role:"user",content:prompt}],temperature:.82})});if(!res.ok)throw new Error("API错误："+res.status+" "+(await res.text()).slice(0,240));var data=await res.json();return data.choices&&data.choices[0]&&data.choices[0].message?data.choices[0].message.content:JSON.stringify(data)}
+async function testApi(){try{var r=await callLLM("请回复：API连接成功，User人设生成器已就绪。");showToast("测试成功");display(r)}catch(e){showToast("测试失败");display("测试失败：\n"+e.message+"\n\n如果是 Failed to fetch，多半是浏览器 CORS 限制，需要后端代理。")}}
+
+var TAG_PICK_COUNTS={worldType:[2,4],worldSubType:[2,5],worldKeywords:[3,7],worldFunction:[2,5],worldDailyTexture:[3,7],userSocialIdentity:[1,4],userWorldPosition:[1,3],userSpecialness:[2,5],personaSurface:[3,6],personaMiddle:[4,8],personaCore:[3,6],personaConflict:[2,5],personaFlaws:[2,5],defenseMode:[1,4],growthArc:[1,3],appearanceAura:[3,6],appearanceFace:[4,8],appearanceBody:[3,6],appearanceStyle:[3,7],sensoryDetails:[2,5],hobbySurface:[3,6],hobbyPrivate:[2,5],dailyLife:[3,6],aloneHabit:[1,4],stressBehavior:[1,4],lifeTexture:[2,5],attractionSource:[3,6],breakType:[2,5],relationshipNeeds:[3,6],attractionTrigger:[2,5],loveLanguage:[3,6],favoredResponse:[2,5],repairMode:[2,5],relationshipBoundary:[3,6],chemistryType:[3,6]};
+function randInt(min,max){return Math.floor(Math.random()*(max-min+1))+min}
+function shuffleCopy(arr){var a=(arr||[]).slice();for(var i=a.length-1;i>0;i--){var j=Math.floor(Math.random()*(i+1));var t=a[i];a[i]=a[j];a[j]=t}return a}
+function pickRandomFrom(k,mm){var opts=TAGS[k]||[];mm=mm||TAG_PICK_COUNTS[k]||[1,3];var n=Math.min(opts.length,randInt(mm[0]||0,mm[1]||1));return shuffleCopy(opts).slice(0,n)}
+function randomPickAllTags(showMsg){Object.keys(TAGS).forEach(function(k){if(k!=="outputBlocks")selected[k]=pickRandomFrom(k)});renderAll();if(showMsg)showToast("已随机生成一组标签，可继续手动改动")}
+function autoTagSeedText(){return [val("userName"),val("userGender"),val("userAge"),val("personaType"),val("goal"),val("extra")].join("\n")}
+function meaningfulMainInput(){return !!(val("goal").trim()||val("extra").trim()||val("userName").trim()||val("personaType")!=="女性向小说女主")}
+function addToObj(obj,k,items){obj[k]=obj[k]||[];items.forEach(function(t){if(TAGS[k]&&TAGS[k].indexOf(t)>=0&&obj[k].indexOf(t)<0)obj[k].push(t)})}
+function heuristicAutoTags(){var s=autoTagSeedText();var obj={};Object.keys(TAGS).forEach(function(k){if(k!=="outputBlocks")obj[k]=pickRandomFrom(k)});
+  if(/校园|学生|同桌|学长|学妹|晚自习|大学|宿舍/.test(s)){addToObj(obj,"worldType",["现代校园","女性向校园群像"]);addToObj(obj,"worldSubType",["校园青春","晚自习与天台","图书馆偶遇"]);addToObj(obj,"worldDailyTexture",["学校走廊和晚自习","图书馆靠窗座位"])}
+  if(/娱乐|偶像|演员|爱豆|粉丝|练习室/.test(s)){addToObj(obj,"worldType",["现代娱乐圈","女性向娱乐圈群像"]);addToObj(obj,"worldSubType",["娱乐圈曝光","练习室后台"]);addToObj(obj,"worldKeywords",["舆论压力","公众面具","私下真实"])}
+  if(/同居|合租|公寓|邻居|屋檐/.test(s)){addToObj(obj,"worldType",["同居屋檐下","合租公寓"]);addToObj(obj,"worldSubType",["合租公寓日常","邻居互助"]);addToObj(obj,"worldKeywords",["同住边界","日常偏爱"]);addToObj(obj,"worldDailyTexture",["合租客厅的暖灯","玄关多出来的伞"])}
+  if(/古风|世家|宫廷|女尊|仙侠|江湖/.test(s)){addToObj(obj,"worldType",["古代架空","女性向古风群像"]);addToObj(obj,"worldSubType",["古风世家","宫廷权谋","世家门阀"]);addToObj(obj,"worldKeywords",["家族压力","身份差"])}
+  if(/普通|生活|日常|治愈/.test(s)){addToObj(obj,"personaSurface",["普通生活感","温和礼貌"]);addToObj(obj,"worldFunction",["提供生活氛围","制造长期陪伴日常"]);addToObj(obj,"appearanceAura",["邻家生活感","干净感"])}
+  if(/清冷|冷淡|慢热|安静/.test(s)){addToObj(obj,"personaSurface",["清冷疏离","慢热安静"]);addToObj(obj,"personaConflict",["看似冷淡其实很容易心软"]);addToObj(obj,"appearanceAura",["清冷淡颜","冷感美人"])}
+  if(/活泼|明亮|小太阳|元气/.test(s)){addToObj(obj,"personaSurface",["活泼明亮","明媚小太阳"]);addToObj(obj,"appearanceAura",["元气感","少女感"])}
+  if(/懂事|忍|缺安全感|被偏爱|坚定选择/.test(s)){addToObj(obj,"personaCore",["渴望被坚定选择","需要被偏爱","表面独立内心很软"]);addToObj(obj,"personaFlaws",["容易逞强","有时过度体谅别人"]);addToObj(obj,"relationshipNeeds",["被坚定选择","被允许脆弱","需要稳定回应"]);addToObj(obj,"attractionTrigger",["对方记得她随口一句话","对方没有逼问但一直在"]);addToObj(obj,"favoredResponse",["第一反应是不敢确认","会把收到的偏爱认真回赠"]);addToObj(obj,"repairMode",["不喜欢冷暴力","需要具体道歉而不是敷衍哄人"])}
+  if(/钓|骄纵|大小姐/.test(s)){addToObj(obj,"personaSurface",["钓系自然","骄纵但不坏"]);addToObj(obj,"personaConflict",["看似钓系其实纯情","看似骄纵其实缺安全感"]);addToObj(obj,"appearanceAura",["大小姐感","钓系松弛感"])}
+  return obj}
+function normalizeAutoTagObject(obj){var out={};Object.keys(TAGS).forEach(function(k){if(k==="outputBlocks")return;var raw=obj&&obj[k];if(typeof raw==="string")raw=raw.split(/[、,，|]/).map(function(x){return x.trim()});if(!Array.isArray(raw))raw=[];out[k]=raw.filter(function(x){return TAGS[k].indexOf(x)>=0});if(!out[k].length)out[k]=pickRandomFrom(k)});return out}
+function applyAutoTags(obj){var normalized=normalizeAutoTagObject(obj||{});Object.keys(normalized).forEach(function(k){selected[k]=normalized[k]||[]});renderAll();showToast("标签已智能匹配，可继续手动调整")}
+function extractJsonObject(text){var s=String(text||"").trim();s=s.replace(/^```(?:json)?/i,"").replace(/```$/," ").trim();var start=s.indexOf("{"),end=s.lastIndexOf("}");if(start>=0&&end>start)s=s.slice(start,end+1);return JSON.parse(s)}
+function buildAutoTagPrompt(){var counts={};Object.keys(TAG_PICK_COUNTS).forEach(function(k){counts[k]=TAG_PICK_COUNTS[k]});return "你是User人设生成器的标签选择助手。请根据【User基础设定】从标签库中为每组选择逻辑一致的标签。只输出JSON对象，不要解释。key必须覆盖除outputBlocks外的全部标签组。每个value是字符串数组，字符串必须原样来自对应标签库，不得自创。\n\n【User基础设定】\n"+autoTagSeedText()+"\n\n【每组建议数量】\n"+JSON.stringify(counts)+"\n\n【标签库】\n"+JSON.stringify(TAGS)}
+async function autoPickTags(){var btn=el("autoTagBtn");btn.disabled=true;btn.innerHTML="⏳ AI 匹配中...";try{if(!meaningfulMainInput()){randomPickAllTags(false);return}var base=val("apiBase").trim(),key=val("apiKey").trim();if(!base||!key){applyAutoTags(heuristicAutoTags());showToast("未配置API，已用本地逻辑匹配");return}var r=await callLLM(buildAutoTagPrompt());applyAutoTags(extractJsonObject(r))}catch(e){applyAutoTags(heuristicAutoTags());showToast("AI匹配失败，已用本地逻辑兜底")}finally{btn.disabled=false;btn.innerHTML="🤖 AI 根据①智能匹配标签"}}
+
+function buildPrompt(d){return `你是专业的女性向人设设计师、世界观设计师、User面具设计师。默认 User 是女性，除非用户明确选择其他性别。请根据以下信息生成一个完整丰富的 User 人设。重点不是写一个空心完美女主，而是写出有世界位置、有社会身份、有生活细节、有多层人格、有关系吸引力、能和角色生成器/群聊生成器联动的 User。
+
+【基础要求】
+User名字/昵称：${d.userName || "由AI补全"}
+性别/性向：${d.userGender}
+年龄段：${d.userAge}
+生成方向：${d.personaType}
+User想要的感觉：${d.goal || "生成一个有世界观位置、多层人格、生活细节和关系吸引力的User人设"}
+补充要求/避雷：${d.extra || "不要写成完美空心万人迷，要有缺点、软肋、成长线和边界。"}
+输出丰富度：${d.richness}
+输出风格：${d.outputStyle}
+示例数量：${d.exampleCount}
+
+【世界观与User世界位置】
+世界大类：${d.worldType}
+世界规则/流派细分：${d.worldSubType}
+世界关键词/压力来源：${d.worldKeywords}
+世界观作用：${d.worldFunction}
+世界日常质感：${d.worldDailyTexture}
+User社会身份/职业身份：${d.userSocialIdentity}
+User社会位置/阵营关系：${d.userWorldPosition}
+User特殊性/隐藏点：${d.userSpecialness}
+世界观完整度：${d.worldDetailLevel}
+User与世界绑定度：${d.worldBond}
+世界风格：${d.worldTone}
+自定义世界观：${d.customWorld || "无"}
+
+【User多层人格】
+表层人格：${d.personaSurface}
+中层行为：${d.personaMiddle}
+深层核心：${d.personaCore}
+人格矛盾：${d.personaConflict}
+缺点/不完美：${d.personaFlaws}
+情绪防御机制：${d.defenseMode}
+成长线：${d.growthArc}
+自定义人格：${d.customPersona || "无"}
+
+【外貌与气质】
+整体气质：${d.appearanceAura}
+脸部/眼睛/发型：${d.appearanceFace}
+身材/体态：${d.appearanceBody}
+穿搭风格：${d.appearanceStyle}
+感官记忆点：${d.sensoryDetails}
+自定义外貌：${d.customAppearance || "无"}
+
+【爱好、生活细节与日常】
+表层爱好：${d.hobbySurface}
+私密爱好：${d.hobbyPrivate}
+日常生活状态：${d.dailyLife}
+独处习惯：${d.aloneHabit}
+压力下行为：${d.stressBehavior}
+房间/社交平台/手机习惯：${d.lifeTexture}
+自定义生活细节：${d.customLife || "无"}
+
+【关系吸引力与亲密模式】
+User吸引人的地方：${d.attractionSource}
+容易让哪类角色破防：${d.breakType}
+亲密关系需求：${d.relationshipNeeds}
+容易心动/被打动触发点：${d.attractionTrigger}
+表达爱的方式：${d.loveLanguage}
+被偏爱时的反应：${d.favoredResponse}
+冲突与和好模式：${d.repairMode}
+关系边界：${d.relationshipBoundary}
+与不同角色类型的化学反应：${d.chemistryType}
+自定义关系设定：${d.customRelationship || "无"}
+
+【输出规则】
+1. 中文输出。
+2. 不要输出代码、JSON、Markdown加粗符号，不要用星号加粗。
+3. 段落清晰，每个模块用【】标题。
+4. 世界观必须丰富完整，不要只写两三句背景；必须写出世界运行规则、日常空间、社会阶层/制度、外部压力、隐藏暗线、长期主线，以及这些内容怎样影响 User 的身份和选择。
+5. User身份必须丰富且和世界观强绑定：写清楚她的社会身份/职业身份、日常责任、生活圈层、人际位置、为什么在这里、她受到的限制、她的秘密/特殊性、她如何影响关系。
+6. User人格必须分层丰富：表层、中层、深层、矛盾、缺点、防御、成长线都要具体，并转化成行为和场景。
+7. 外貌不要只堆美貌，要同时支持普通、耐看、清秀、生活化、明艳、清冷、成熟、元气等类型；必须写第一眼记忆点、普通但真实的细节、气味、声音、穿搭、熟人才知道的小细节，不要把所有User都写成完美大美女。
+8. 爱好和生活细节必须非常具体：要写她如何安排一天、房间里有什么、手机里有什么、常去哪里、压力大时做什么、独处时怎么恢复、爱好如何进入关系互动；不要只写爱好列表。
+9. 关系吸引力必须丰富具体：写清她为什么会打动不同类型角色、她如何被坚定选择打动、她如何回应偏爱、关系推进需要哪些触发点、冲突后怎样修复；不能把她写成所有人无理由喜欢的空心万人迷。
+10. 亲密模式必须有边界：写清她接受什么、不接受什么、何时靠近、何时退后、如何保持主体性；不要让User只是被爱、被保护、被争夺的对象。
+
+【强制输出结构】
+【一句话User钩子】
+身份 + 世界位置 + 人格反差 + 关系吸引力，不超过80字。
+
+【基础信息】
+姓名、昵称、年龄、性别/性向、身份定位、所在世界、常用称呼、社交印象。
+
+【完整世界观】
+写成完整场域：世界是什么、普通人如何生活、核心规则/制度、外部压力、隐藏暗线、长期主线、User为什么在这里。
+
+【User的世界位置与身份】
+她的社会身份/职业身份、社会位置、阵营关系、生活圈层、日常责任、日常空间、被谁需要、被谁误解、她和世界规则的冲突、她的秘密或特殊性。
+
+【外貌与感官记忆点】
+整体气质、五官、发型、身材体态、穿搭、气味、声音、标志物、第一眼记忆点、普通生活感细节、变漂亮/认真打扮时的样子、熟人才知道的小细节。要求既能写普通耐看型，也能写明艳美丽型，不能只有空泛夸赞。
+
+【多层人格】
+表层人格：别人第一眼看到的样子。
+中层行为：长期相处后的稳定表现。
+深层核心：真正渴望、恐惧、软肋。
+人格矛盾：最有张力的反差。
+缺点/不完美：让她像真人的地方。
+情绪防御机制：受伤时如何保护自己。
+成长线：她会从哪里走向哪里。
+
+【成长经历】
+童年/少年/现在。每阶段都要说明如何塑造她的人格、边界和关系需求。
+
+【家庭与社交背景】
+家庭氛围、重要朋友/旧关系、社交状态、她在熟人眼中的样子。
+
+【生活细节】
+居住空间、房间风格、手机/社交平台习惯、饮食偏好、常去地点、独处状态、压力下行为、开心时行为、通勤/上学/工作路线、包里常备物、房间气味、睡前和起床习惯。
+
+【爱好与习惯】
+表层爱好、私密爱好、小怪癖、长期习惯、喜欢的食物/饮品、常去地点、独处消遣、压力下的自我安抚方式、房间/手机/社交平台痕迹、会带进关系互动里的细节。每一类都要具体成生活画面，不要只列标签。
+
+【情绪模式】
+开心、难过、生气、吃醋、被偏爱、被误解、需要帮助时分别如何表现。
+
+【亲密关系模式】
+她如何被打动、如何表达喜欢、如何试探、如何设边界、如何回应偏爱、最怕什么关系模式。必须写出慢热/主动/退缩/确认关系后的差异。
+
+【关系吸引力来源】
+具体说明她为什么会吸引角色。不要写空泛的“她很特别”，要写行为、场景和细节。至少包含：被看见感、日常稳定感、边界感、脆弱时刻、反差感。
+
+【心动触发与被偏爱反应】
+写清她会因哪些细节心动；被偏爱时外在怎么装、内心怎么动摇、之后会怎样回赠。
+
+【冲突与和好模式】
+写清吵架、误会、冷淡、吃醋、被忽略时的反应，以及什么样的解释/行动能让她重新靠近。
+
+【关系边界】
+写清她不能接受的关系模式、需要确认同意的地方、如何保留自我空间，以及偏爱和控制的分界线。
+
+【与不同类型角色的化学反应】
+至少写：冷脸克制型、年下小狗型、爹系照顾型、嘴欠气氛组、疯批但守边界型、群聊成员。每类都写互动张力和边界。
+
+【适合的剧情开场】
+给出${d.exampleCount}个开场。每个包含：场景、User状态、角色为什么注意到她、互动入口。
+
+【User说话风格】
+自称、常用语气、聊天长度、撒娇/嘴硬/认真时的差异、不喜欢怎样被回应。
+
+【User示例发言】
+输出${d.exampleCount}组，包含：日常轻松、低落时、被偏爱时、设边界时。
+
+【角色生成器联动版】
+压缩成一段可复制到角色生成器“User人设/用户面具”的版本。
+
+【群聊生成器联动版】
+压缩成一段可复制到群聊角色生成器“User人设/用户面具”的版本。
+
+【压缩导入版】
+适合直接放进AI小手机/角色卡里的简洁版，保留世界位置、人格核心、生活细节、关系需求和边界。`;}
+function fallback(d){return "API调用失败，已使用本地模板。\n\n【一句话User钩子】\n一个围绕「"+(d.goal||"User人设")+"」生成的User，她需要拥有完整世界位置、多层人格、生活细节和关系吸引力。\n\n【世界观方向】\n"+d.worldType+"｜"+d.worldSubType+"\n\n【人格方向】\n表层："+d.personaSurface+"\n中层："+d.personaMiddle+"\n深层："+d.personaCore+"\n矛盾："+d.personaConflict+"\n\n【外貌方向】\n"+d.appearanceAura+"｜"+d.appearanceFace+"｜"+d.appearanceStyle+"\n\n【关系吸引力】\n"+d.attractionSource+"\n\n配置API后可生成完整长篇设定。"}
+async function generate(){var btn=el("genBtn");btn.disabled=true;btn.innerHTML="⏳ 生成中...";el("out").className="output placeholder";el("out").innerText="正在生成完整世界观与User多层人设...";var d=getConfig();lastPrompt=buildPrompt(d);try{result=await callLLM(lastPrompt);display(result)}catch(e){result="API调用失败，已使用本地模板生成。\n错误信息："+e.message+"\n\n"+fallback(d);display(result)}try{localStorage.setItem("user_persona_last",result)}catch(e){}btn.disabled=false;btn.innerHTML="✨ 生成 User 人设"}
+function copyText(){if(!result){showToast("还没有内容可以复制哦");return}copyString(result,"已复制")}
+function copyPromptOnly(){var d=getConfig();lastPrompt=buildPrompt(d);copyString(lastPrompt,"提示词已复制")}
+function copyString(s,msg){var t=document.createElement("textarea");t.value=s;document.body.appendChild(t);t.select();document.execCommand("copy");document.body.removeChild(t);showToast(msg)}
+function saveText(){if(!result){showToast("还没有内容可以保存哦");return}saves.unshift({id:Date.now(),date:new Date().toLocaleString(),content:result,title:val("userName")||val("personaType"),config:getConfig(),prompt:lastPrompt});if(saves.length>50)saves=saves.slice(0,50);localStorage.setItem("user_persona_saves",JSON.stringify(saves));renderSaves();showToast("已存入本地")}
+function renderSaves(){var box=el("saves");if(!saves.length){box.innerHTML="暂无存档";return}box.innerHTML="";saves.forEach(function(s){var d=document.createElement("div");d.className="save";d.innerHTML="<b>🐾 "+htmlEscape(s.title||"未命名")+"</b><div class='small'>"+htmlEscape(s.date)+"</div><div class='actions'><button class='btn-blue'>📖 加载</button><button class='btn-white'>🗑️ 删除</button><button class='btn-gold'>📝 导出MD</button><button class='btn-primary'>🗂️ 导出JSON</button></div>";var bs=d.querySelectorAll("button");bs[0].onclick=function(){display(s.content);if(s.config)applyConfig(s.config);lastPrompt=s.prompt||"";showToast("已加载存档")};bs[1].onclick=function(){saves=saves.filter(function(x){return x.id!==s.id});localStorage.setItem("user_persona_saves",JSON.stringify(saves));renderSaves()};bs[2].onclick=function(){downloadFile(safeFileName(s.title)+"_"+s.id+".md","# "+(s.title||"User人设")+"\n\n"+s.content,"text/markdown;charset=utf-8")};bs[3].onclick=function(){downloadFile(safeFileName(s.title)+"_"+s.id+".json",JSON.stringify(s,null,2),"application/json;charset=utf-8")};box.appendChild(d)})}
+function init(){loadApi();loadModelCache();renderAll();try{saves=JSON.parse(localStorage.getItem("user_persona_saves")||"[]")}catch(e){saves=[]}renderSaves();try{var last=localStorage.getItem("user_persona_last");if(last)display(last)}catch(e){}}
+init();
+</script>
+</body>
+</html>
